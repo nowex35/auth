@@ -14,7 +14,7 @@
 - other
   - /refresh
   - /logout
-  - (/me)
+  - /me
 
 ---
  
@@ -28,16 +28,15 @@
      - accessトークンからユーザ情報取得
      - ユーザ情報取得出来たらgoogle側のトークンは廃棄
      - refreshトークンを作成し,frontにCookieで送る
-  5. front側のcallbackで受け取りauth/refreshにリクエスト
-  6. /auth/refresh(accesstokenとrefreshトークンを返す)
+  5. front側のcallbackで受け取りauth/meにリクエスト
+  6. /auth/me(user_idを返す)
   7. frontからログアウトのリクエストがあれば/auth/logoutでトークンを削除
 - **prisma**によるスキーマ管理、ORM機能
 - **redis**によるセッション機能(/meの実装が終われば完全)
 - userモデルはpasswordのnullを許し,providerカラムを追加
   - これによりメール認証とoauth認証を同一テーブルで管理可能
 - refreshトークンをdbに保存しつつ,Cookieで配布
-- accessトークンをデコードすることでuser_idが取得可能
-  - /meがうまく実装できればこの構成を変えて独立したトークンとする
+- accessトークンも独自に文字列を生成
 - **Docker-compose**によるコンテナ管理
 - **vitest**によるテスト実行
 - **CI/CD**
