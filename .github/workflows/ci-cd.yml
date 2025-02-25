@@ -14,7 +14,7 @@ env:
   WORK_DIR: ${{ github.workspace }}
   DATABASE_URL: postgres://postgres:postgres@localhost:5432/auth_test
   JWT_SECRET: test_secret
-  REDIS_URL: redis://localhost:6379
+  REDIS_URL: redis://localhost:6389
   NODE_ENV: test
 
 jobs:
@@ -39,7 +39,7 @@ jobs:
       redis:
         image: redis:alpine
         ports:
-          - 6379:6379
+          - 6380:6379
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
