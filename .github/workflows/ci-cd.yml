@@ -10,6 +10,13 @@ on:
       - main
       - develop
 
+env:
+  WORK_DIR: ${{ github.workspace }}
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/auth_test
+  JWT_SECRET: test_secret
+  REDIS_URL: redis://localhost:6379
+  NODE_ENV: test
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
@@ -42,6 +49,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Print GitHub workspace
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "GitHub workspace: $GITHUB_WORKSPACE"
+          echo "WORK_DIR: $WORK_DIR"
+          ls -la $GITHUB_WORKSPACE
+
+      - name : Install Docker Compose Plugin
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
       - name: Set working directory
         run: cd $GITHUB_WORKSPACE && ls -la
