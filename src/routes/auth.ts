@@ -1,10 +1,10 @@
-import { Hono } from 'hono';
-import { getPrisma, getJWTSecret } from '../../prisma/prismaClient';
-import { hash, compare } from 'bcryptjs';
-import { setCookie, getCookie, deleteCookie } from 'hono/cookie';
-import { HTTPException } from 'hono/http-exception';
-import { verify, sign } from 'jsonwebtoken';
-import { createAccessToken, createRefreshToken } from '../utils/jwt';
+import { Hono } from 'hono'
+import { getPrisma, getJWTSecret } from '../../prisma/prismaClient'
+import { hash, compare } from 'bcryptjs'
+import { setCookie, getCookie, deleteCookie } from 'hono/cookie'
+import { HTTPException } from 'hono/http-exception'
+import { verify, sign } from 'jsonwebtoken'
+import { createAccessToken, createRefreshToken } from '../utils/jwt'
 import Redis from "ioredis"
 import { cors } from 'hono/cors'
 
@@ -22,17 +22,17 @@ const auth = new Hono<{ Bindings: Bindings}>()
 
 auth.onError((err, c) => {
     if (err instanceof HTTPException) {
-      return c.json({ message: err.message }, err.status);
+        return c.json({ message: err.message }, err.status)
     }
-    console.error('Unexpected error:', err);
-    return c.json({ message: 'Internal Server Error' }, 500);
-  });
-  
-  auth.use(cors({
-      origin: ["http://localhost:3000", "http://localhost:8000"],
-      credentials: true
-  }))
-  
+    console.error('Unexpected error:', err)
+    return c.json({ message: 'Internal Server Error' }, 500)
+})
+
+auth.use(cors({
+    origin: ["http://localhost:3000", "http://localhost:8000"],
+    credentials: true
+}))
+
 
 /*
 ヘルパー関数
@@ -47,18 +47,18 @@ function generateRandomString(length: number){
 }
 
 function getEnvString(env: { [key: string]: string }, key: string): string {
-    const value = process.env[key];
+    const value = process.env[key]
     if (!value) {
-        throw new Error(`❌ ${key} is not set in environment variables!`);
+        throw new Error(`❌ ${key} is not set in environment variables!`)
     }
-    return value;
+    return value
 }
 //getEnvString(c.env, "API_KEY")
 
 function generateToken(length: number = 32): string {
-    const array = new Uint8Array(length);
-    crypto.getRandomValues(array);
-    return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("");
+    const array = new Uint8Array(length)
+    crypto.getRandomValues(array)
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("")
 }
 
 /*
@@ -88,7 +88,7 @@ auth.post('/login', async (c) => {
         throw new HTTPException(401, {message: 'Invalid email or password'})
     }
 
-    const JWT_SECRET = getJWTSecret(c.env);
+    const JWT_SECRET = getJWTSecret(c.env)
     const accessToken = createAccessToken(user.email, JWT_SECRET)
     const refreshToken = createRefreshToken(user.email, JWT_SECRET)
 
@@ -106,7 +106,7 @@ auth.get('/verify', async (c) => {
         throw new HTTPException(401, {message: 'No token provided'} )
     }
 
-    const JWT_SECRET = getJWTSecret(c.env);
+    const JWT_SECRET = getJWTSecret(c.env)
 
     try {
         const decoded = verify(token, JWT_SECRET) as {userId: string}
@@ -132,7 +132,7 @@ auth.get('/oauth/google', (c) => {
         sameSite: "Lax", // CSRF 対策
         maxAge: 300, // 5分間有効
         path: '/',
-    });
+    })
     const google_uri = getEnvString(c.env, "GOOGLE_REDIRECT_URI")
     const google_client_id = getEnvString(c.env,"GOOGLE_CLIENT_ID")
 
@@ -152,19 +152,19 @@ auth.get('/oauth/google/callback', async (c) => {
     // codeは認可コード
     const code = c.req.query('code')
     const state = c.req.query('state')
-    const storedState = getCookie(c, "oauth_state"); // Cookie に保存していた `state`
+    const storedState = getCookie(c, "oauth_state") // Cookie に保存していた `state`
 
     const google_uri = getEnvString(c.env,"GOOGLE_REDIRECT_URI")
     const google_client_id = getEnvString(c.env,"GOOGLE_CLIENT_ID")
     const google_client_secret = getEnvString(c.env,"GOOGLE_CLIENT_SECRET")
 
     if (!code || !state) {
-        throw new HTTPException(400, { message: 'Invalid code or state' });
+        throw new HTTPException(400, { message: 'Invalid code or state' })
     }
 
     // `state` の一致を確認
     if (state !== storedState) {
-        throw new HTTPException(400, { message: 'Invalid state' });
+        throw new HTTPException(400, { message: 'Invalid state' })
     }
 
     //Googleのトークンエンドポイントへ認可コードを渡してアクセストークンを取得
@@ -182,7 +182,7 @@ auth.get('/oauth/google/callback', async (c) => {
 
     const tokenData = await tokenResponse.json()
     if (!tokenData.access_token) {
-        throw new HTTPException(400, { message: 'Invalid token data' });
+        throw new HTTPException(400, { message: 'Invalid token data' })
     }
     const google_accessToken = tokenData.access_token
 
@@ -226,9 +226,9 @@ auth.get('/oauth/google/callback', async (c) => {
         maxAge: 7*24*60*60, // 7日
         sameSite: 'None',
         path: '/'
-    });
+    })
 
-    return c.redirect('http://localhost:3000/auth/callback');
+    return c.redirect('http://localhost:3000/auth/callback')
 })
 
 auth.get('/refresh', async (c) => {
@@ -253,26 +253,26 @@ auth.get('/refresh', async (c) => {
                 maxAge: 0,
                 path: '/'
             })
-            throw new HTTPException(401, { message: 'Invalid or expired refresh token' });
+            throw new HTTPException(401, { message: 'Invalid or expired refresh token' })
         }
 
         // テスト環境ではモックが期待する特定の値を返す
         if (process.env.NODE_ENV === 'test') {
-            return c.json({ accessToken: 'new_access_token' });
+            return c.json({ accessToken: 'new_access_token' })
         }
         
         // 実際の環境では新しいトークンを生成
-        const newAccessToken = generateToken();
+        const newAccessToken = generateToken()
         // アクセストークンをRedisに保存
-        const redis = new Redis(getEnvString(c.env, "REDIS_URL"));
+        const redis = new Redis(getEnvString(c.env, "REDIS_URL"))
         await redis.set(
-            `session:${newAccessToken}`, 
-            JSON.stringify({ userId: refreshTokenData.user.id }), 
-            'EX', 
+            `session:${newAccessToken}`,
+            JSON.stringify({ userId: refreshTokenData.user.id }),
+            'EX',
             15 * 60
-        ); // 15分間有効
+        ) // 15分間有効
         
-        return c.json({ accessToken: newAccessToken });
+        return c.json({ accessToken: newAccessToken })
     } catch (e) {
         throw new HTTPException(401, { message: 'Invalid refresh token' })
     }
@@ -280,17 +280,17 @@ auth.get('/refresh', async (c) => {
 
 auth.post('/logout', async (c) => {
     // リフレッシュトークンをクッキーから取得
-    const refreshToken = getCookie(c, 'refreshToken');
+    const refreshToken = getCookie(c, 'refreshToken')
     if (refreshToken) {
         // DBからトークンを削除（セキュリティのため）
         try {
-            const prisma = getPrisma(c.env);
+            const prisma = getPrisma(c.env)
             await prisma.refreshToken.delete({
                 where: { token: refreshToken }
-            });
+            })
         } catch (error) {
             // トークンが見つからない場合などのエラーは無視
-            console.error('Error deleting refresh token:', error);
+            console.error('Error deleting refresh token:', error)
         }
     }
     
@@ -301,41 +301,37 @@ auth.post('/logout', async (c) => {
         sameSite: 'Strict',
         maxAge: 0, // 即時削除
         path: '/'
-    });
+    })
     
-    return c.json({ message: 'Logged out successfully' });
-});
+    return c.json({ message: 'Logged out successfully' })
+})
 
 
-// auth.get('/me', async (c) => {
-//     const redis = new Redis(getEnvString(c.env,"REDIS_URL"))
-//     //c.req.Cookieがないらしいので、ヘッダーからスプリットで取得する
-//     const authHeader = c.req.header("Authorization")
-//     console.log("authHeader:",authHeader)
+auth.get('/me', async (c) => {
+    const redis = new Redis(getEnvString(c.env,"REDIS_URL"))
+    //c.req.Cookieがないらしいので、ヘッダーからスプリットで取得する
+    const authHeader = c.req.header("Authorization")
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return c.json({error: "No authorization token provided"}, 401)
+    }
 
-//     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-//         return c.json({error: "No authorization token provided"}, 401)
-//     }
+    const accessToken = authHeader.replace("Bearer ", "").trim()
+    if (!accessToken) return c.json({error: "Unauthorized"}, 401)
 
-//     const accessToken = authHeader.replace("Bearer ", "").trim()
-//     console.log("accessToken:",accessToken)
-//     if (!accessToken) return c.json({error: "Unauthorized"}, 401)
+    // セッションキーから直接 sessionData を取得
+    const sessionData = await redis.get(`session:${accessToken}`)
+    if (!sessionData) {
+        return c.json({ error: "Invalid token" }, 403)
+    }
 
-//     // セッションキーから直接 sessionData を取得
-//     const sessionData = await redis.get(`session:${accessToken}`);
-//     console.log("sessionData:",sessionData)
-//     if (!sessionData) {
-//         return c.json({ error: "Invalid token" }, 403);
-//     }
+    // sessionData は { userId: string } の形になっているので解析する
+    const { userId } = JSON.parse(sessionData)
+    if (!userId) {
+        return c.json({ error: "Invalid session data" }, 500)
+    }
 
-//     // sessionData は { userId: string } の形になっているので解析する
-//     const { userId } = JSON.parse(sessionData);
-//     if (!userId) {
-//         return c.json({ error: "Invalid session data" }, 500);
-//     }
-
-//     // 必要であれば、ここでデータベースからユーザー情報を取得すると良いでしょう
-//     return c.json({ user: { userId } });
-// })
+    // 必要であれば、ここでデータベースからユーザー情報を取得すると良いでしょう
+    return c.json({ user: { userId } })
+})
 
 export default auth
