@@ -50,6 +50,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Create .env file
+        run: |
+          echo "DATABASE_URL=${DATABASE_URL}" >> .env
+          echo "JWT_SECRET=${JWT_SECRET}" >> .env
+          echo "REDIS_URL=${REDIS_URL}" >> .env
+          echo "NODE_ENV=${NODE_ENV}" >> .env
+        working-directory: ${{ github.workspace }}
+
       - name: Set working directory
         run: cd $GITHUB_WORKSPACE && ls -la
 
