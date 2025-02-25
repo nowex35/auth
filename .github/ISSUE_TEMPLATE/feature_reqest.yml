@@ -1,0 +1,58 @@
+name: Feature Request
+description: Suggest a new feature or improvement
+title: "[Feature]: "
+labels: ["enhancement", "discussion"]
+assignees:
+  - octocat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a feature! Please fill out the details below to help us understand your request.
+  - type: input
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: Provide a brief summary of the feature request.
+      placeholder: e.g., Add dark mode support
+    validations:
+      required: true
+  - type: textarea
+    id: problem-description
+    attributes:
+      label: What problem does this feature solve?
+      description: Explain the problem or pain point this feature addresses.
+      placeholder: Currently, the UI is too bright at night, making it hard to use in low-light environments.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe how you think this feature should work.
+      placeholder: Add a toggle switch for dark mode in the settings menu.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered other approaches? If so, describe them.
+      placeholder: I tried using a browser extension, but it doesn't work well with all UI elements.
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this feature to you?
+      options:
+        - Low
+        - Medium
+        - High
+        - Critical
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Provide any additional details or screenshots if applicable.

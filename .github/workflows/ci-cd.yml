@@ -1,0 +1,122 @@
+name: CI/CD for Auth API
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: auth_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      redis:
+        image: redis:alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker images
+        run: docker-compose build
+
+      - name: Start services
+        run: docker-compose up -d db redis auth
+
+      - name: Wait for PostgreSQL to be ready
+        run: sleep 10
+
+      - name: Install Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Generate Prisma client
+        run: bun prisma generate
+
+      - name: Run Prisma migrations
+        run: bun prisma migrate deploy
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/auth_test
+
+      - name: Run tests
+        run: bun test
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/auth_test
+          JWT_SECRET: test_secret
+          REDIS_URL: redis://localhost:6379
+          NODE_ENV: test
+
+      - name: Stop services
+        if: always()
+        run: docker-compose down
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-results
+          path: |
+            coverage/
+            test-report.xml
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Check for required secrets
+        run: |
+          if [ -z "${{ secrets.EC2_HOST }}" ] || [ -z "${{ secrets.EC2_USER }}" ] || [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then
+            echo "❌ 必要な環境変数が設定されていません。デプロイを停止します。"
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            cd /path/to/your/project
+            git pull origin main
+            docker-compose down
+            docker-compose up -d --build

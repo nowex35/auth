@@ -1,0 +1,89 @@
+name: Bug Report
+description: Submit a bug report to help us improve
+title: "[Bug]: "
+labels: ["bug", "needs triage"]
+assignees:
+  - octocat
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report a bug! Please provide as much detail as possible.
+  - type: input
+    id: summary
+    attributes:
+      label: Bug Summary
+      description: Provide a brief summary of the bug.
+      placeholder: e.g., Dashboard not loading after login
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Please provide the steps to reproduce the issue.
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: Describe what you expected to happen.
+      placeholder: The dashboard should load correctly after login.
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: Describe what actually happened.
+      placeholder: Dashboard shows a blank page.
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Specify the environment where the issue occurred.
+      options:
+        - Production
+        - Staging
+        - Development
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      description: Which browser are you using?
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Microsoft Edge
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: browser-version
+    attributes:
+      label: Browser Version
+      description: Enter the browser version.
+      placeholder: e.g., 120.0.0
+  - type: input
+    id: os
+    attributes:
+      label: Operating System
+      description: Specify your operating system.
+      placeholder: e.g., Windows 11, macOS Sonoma, Ubuntu 22.04
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Log Output
+      description: Paste any relevant log output or error messages.
+      render: shell

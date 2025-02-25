@@ -1,0 +1,32 @@
+{
+  "name": "nowex35-auth",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/server.ts",
+    "build": "bun build src/server.ts --outdir=dist --target=browser --format=esm",
+    "start": "bun run src/server.ts"
+  },
+  "devDependencies": {
+    "@flydotio/dockerfile": "^0.7.8",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.9",
+    "prisma": "^6.4.1",
+    "vitest": "^3.0.7"
+  },
+  "peerDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "@prisma/adapter-pg": "^6.4.1",
+    "@prisma/client": "^6.4.1",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.7",
+    "hono": "^4.7.2",
+    "ioredis": "^5.5.0",
+    "jsonwebtoken": "^9.0.2",
+    "next": "^15.1.7"
+  }
+}

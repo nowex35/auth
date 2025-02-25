@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  auth:
+    build: 
+      context: .
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db
+      - redis
+    env_file: .env
+    networks:
+      - app-network
+
+#認証用DB
+  db:
+    image: postgres:13
+    ports:
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+  redis_data:
+
+networks:
+  app-network:
