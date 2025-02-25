@@ -90,7 +90,7 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/auth_test
 
       - name: Run tests
-        run: bun test
+        run: bun run vitest
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/auth_test
           JWT_SECRET: test_secret
