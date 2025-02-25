@@ -10,6 +10,13 @@ on:
       - main
       - develop
 
+env:
+  WORK_DIR: ${{ github.workspace }}
+  DATABASE_URL: postgres://postgres:postgres@localhost:5432/auth_test
+  JWT_SECRET: test_secret
+  REDIS_URL: redis://localhost:6379
+  NODE_ENV: test
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
