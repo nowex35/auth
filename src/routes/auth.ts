@@ -334,4 +334,127 @@ auth.get('/me', async (c) => {
     return c.json({ user: { userId } })
 })
 
+
+// //Basic風認証
+// //ユーザー名(dbの都合上email)とパスワードをBase64エンコードして送信する認証方式
+
+// auth.get('/basic/register', async (c) => {
+//     const { email, password } = c.req.query()
+
+//     if (!email || !password) {
+//         return c.text(
+//             "ユーザー名とパスワードを入力してください",
+//             400,
+//             { "Content-Type": "text/plain" }
+//         )
+//     }
+
+//     const prisma = getPrisma(c.env)
+
+//     const existingUser = await prisma.user.findUnique({
+//         where: { email }
+//     })
+//     if (existingUser) {
+//         return c.text(
+//             `<html>
+//                 <head>
+//                     <title>ユーザー登録失敗</title>
+//                 </head>
+//                 <body>
+//                     <h1>ユーザー登録失敗</h1>
+//                     <p>ユーザーは既に存在します</p>
+//                 </body>
+//             </html>`,
+//             400,
+//             { "Content-Type": "text/html" }
+//         )
+//     }
+//     const hashedPassword = Buffer.from(password).toString('base64')
+//     const user = await prisma.user.create({
+//         data: {
+//             email: email,
+//             password: hashedPassword,
+//             provider: 'basic'
+//         }
+//     })
+
+//     return c.text(
+//         `<html>
+//             <head>
+//                 <title>ユーザー登録成功</title>
+//             </head>
+//             <body>
+//                 <h1>ユーザー登録成功</h1>
+//                 <p>ユーザー登録に成功しました</p>
+//             </body>
+//         </html>`,
+//         200,
+//         { "Content-Type": "text/html" }
+//     )
+// })
+
+// auth.get('/basic/access', async (c) => {
+//     const authHeader = c.req.header("Authorization")
+//     if (!authHeader) {
+//         return c.text(
+//             '認証に失敗しました',
+//             401,
+//             { "WWW-Authenticate": 'Basic realm="Access to the staging site"' }
+//         )
+//     }
+
+//     const [type, credentials] = authHeader.split(" ")
+//     if (type.toLowerCase() !== "basic") {
+//         return c.text(
+//             "認証情報が不正です",
+//             401,
+//             { "WWW-Authenticate": 'Basic realm="Access to the staging site"' }
+//         )
+//     }
+
+//     const decoded = Buffer.from(credentials, "base64").toString()
+//     const [email, password] = decoded.split(":")
+
+//     const prisma = getPrisma(c.env)
+//     const user = await prisma.user.findUnique({
+//         where: { email }
+//     })
+//     if (!user || !user.password) {
+//         return c.text(
+//             "認証に失敗しました",
+//             401,
+//             { "WWW-Authenticate": 'Basic realm="Access to the staging site"' }
+//         )
+//     }
+//     if (user.provider !== 'basic') {
+//         return c.text(
+//             "認証情報が不正です",
+//             401,
+//             { "WWW-Authenticate": 'Basic realm="Access to the staging site"' }
+//         )
+//     }
+//     if (!(await compare(password, user.password))) {
+//         return c.text(
+//             "認証情報が一致しません",
+//             401,
+//             { "WWW-Authenticate": 'Basic realm="Access to the staging site"' }
+//         )
+//     }
+
+//     return c.text(
+//         `<html>
+//             <head>
+//                 <title>認証成功</title>
+//             </head>
+//             <body>
+//                 <h1>Welcome, ${user.email}!</h1>
+//                 <p>認証に成功しました</p>
+//             </body>
+//         </html>`,
+//         200,
+//         { "Content-Type": "text/html" }
+//     )
+// })
+
+
 export default auth
