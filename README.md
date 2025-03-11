@@ -16,6 +16,10 @@
   - /refresh
   - /logout
   - /me
+ 
+  - basic認証風
+  - /basic/register
+  - /basic/access
 
 ---
 ## 主な特徴
