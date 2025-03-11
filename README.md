@@ -16,8 +16,8 @@
   - /refresh
   - /logout
   - /me
- 
-  - basic認証風
+
+- basic認証風
   - /basic/register
   - /basic/access
 
