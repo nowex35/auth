@@ -17,11 +17,17 @@
   - /logout
   - /me
 
+- basic認証風
+  - /basic/register
+  - /basic/access
+
 ---
 ## 主な特徴
 #### supabase等のBaaSのAPIを用いない独自のOauth連携認証API
 #### フロントエンドの実装によりメール・Oauthの任意の認証方法を選択できる
 #### なるべく依存を避け、APIの拡張性を確保
+
+###### refreshトークン→oauthトークンに名称を変更し、直接userオブジェクトを取得する形にする予定です(access:refreshが冗長のため)
  
 ## 実装詳細(工夫等)
 - oauth認証は
