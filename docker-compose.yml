@@ -1,6 +1,6 @@
 services:
   auth:
-    build: 
+    build:
       context: .
     ports:
       - "3001:3000"
