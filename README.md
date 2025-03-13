@@ -17,9 +17,8 @@
   - /logout
   - /me
 
-- basic認証風
-  - /basic/register
-  - /basic/access
+- basic認証ページ再現
+  - /basic
 
 ---
 ## 主な特徴
