@@ -32,7 +32,6 @@ auth.use(cors({
     credentials: true
 }))
 
-
 /*
 ヘルパー関数
 */
