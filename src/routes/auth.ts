@@ -61,11 +61,8 @@ function generateToken(length: number = 32): string {
     return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join("")
 }
 
-/*
-Honoではroute handlerの引数にcontextを受け取れる。
-これはHonoが内部で自動作成し、リクエストごとに自動で渡されるContextオブジェクト
-c.json(),c.html()等のメソッドはcontent-typeを自動で設定してくれる
-*/
+
+// MARK:メール認証
 //ユーザー登録
 auth.post('/signup', async (c) => {
     const { email, password } = await c.req.json()
@@ -120,7 +117,7 @@ auth.get('/verify', async (c) => {
         throw new HTTPException(401, {message: 'Invalid token'})
     }
 })
-//Google OAuth2.0
+// MARK:Google OAuth2.0
 
 //Google OAuth2.0の認証リクエスト
 auth.get('/oauth/google', (c) => {
@@ -335,8 +332,9 @@ auth.get('/me', async (c) => {
 })
 
 
-// //Basic風認証
-// //ユーザー名(dbの都合上email)とパスワードをBase64エンコードして送信する認証方式
+// MARK: Basic認証
+
+//ユーザー名(dbの都合上email)とパスワードをBase64エンコードして送信する認証方式
 
 auth.get('/basic', async (c) => {
     const authHeader = c.req.header("Authorization")
