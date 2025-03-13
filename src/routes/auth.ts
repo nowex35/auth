@@ -19,7 +19,6 @@ type Bindings = {
 
 const auth = new Hono<{ Bindings: Bindings}>()
 
-
 auth.onError((err, c) => {
     if (err instanceof HTTPException) {
         return c.json({ message: err.message }, err.status)
