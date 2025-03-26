@@ -4,7 +4,6 @@
 
 ###### このリポジトリはHono.jsによる認証用APIの実装です。  
 ###### 認証ロジックにおかしな点や脆弱性があれば教えていただけると幸いです
-###### Tokenの扱い(accessToken,refreshToken)について冗長に感じるので再考するつもりです
 
 主なAPIは
 - メール認証
@@ -15,9 +14,9 @@
   - /oauth/google
   - /oauth/google/callback
 - other
-  - /refresh
-  - /logout
-  - /me
+  - /refresh    #refreshTokenでaccessTokenを生成
+  - /logout     #sessionを削除
+  - /me         #accessTokenで認証情報を取得
 
 - basic認証ページ再現
   - /basic
