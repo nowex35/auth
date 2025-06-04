@@ -44,8 +44,8 @@ function generateRandomString(length: number){
     return result
 }
 
-function getEnvString(env: { [key: string]: string }, key: string): string {
-    const value = process.env[key]
+function getEnvString(env: { [key: string]: string | undefined }, key: string): string {
+    const value = env[key] ?? process.env[key]
     if (!value) {
         throw new Error(`❌ ${key} is not set in environment variables!`)
     }
@@ -84,9 +84,16 @@ auth.post('/login', async (c) => {
     }
 
     const JWT_SECRET = getJWTSecret(c.env)
-    const accessToken = createAccessToken(user.email, JWT_SECRET)
-    const refreshToken = createRefreshToken(user.email, JWT_SECRET)
+    const accessToken = createAccessToken(user.id, JWT_SECRET)
+    const refreshToken = createRefreshToken(user.id, JWT_SECRET)
 
+    await prisma.refreshToken.create({
+        data: {
+            token: refreshToken,
+            userId: user.id,
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        }
+    })
 
     //リフレッシュトークンをクッキーに保存, secureはHTTPSのみで送信するようにする, sameSiteはCSRF対策
     setCookie(c, 'refreshToken', refreshToken, {httpOnly: true,secure: true, sameSite: 'Strict', maxAge: 7 * 24 * 60 * 60})
