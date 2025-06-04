@@ -186,6 +186,15 @@ describe('認証ルートのテスト', () => {
             const cookies = res.headers.get('Set-Cookie');
             expect(cookies).toBeTruthy();
             expect(cookies).toContain('refreshToken=refresh_token');
+            expect(createAccessToken).toHaveBeenCalledWith('123', 'test_secret');
+            expect(createRefreshToken).toHaveBeenCalledWith('123', 'test_secret');
+            expect(mockPrisma.refreshToken.create).toHaveBeenCalledWith({
+                data: {
+                    token: 'refresh_token',
+                    userId: '123',
+                    expiresAt: expect.any(Date)
+                }
+            });
         });
 
         it('誤った認証情報ではエラーを返すこと', async () => {
